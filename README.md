@@ -15,3 +15,8 @@ Dos retos dominarán el curso, el primero de cara al examen parcial. El segundo 
 Herramientas:
 Google Colab
 GitHub
+
+Colateralmente se verán:
+- Introducción a Ciencia de Datos
+- Introducción a Simuladores
+- Introducción a Ingeniería de sistemas
