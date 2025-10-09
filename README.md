@@ -1,4 +1,4 @@
-Repo de materiales y proyectos de la asignatura Inteligencia Artificial del Grado de Ingeniería Informática la Universidad Europea del Atlántico.
+Repo de retos de la asignatura Inteligencia Artificial del Grado de Ingeniería Informática la Universidad Europea del Atlántico.
 
 Curso [25][26]
 Temario:
