@@ -6,6 +6,7 @@ Reto de Visión Artificial: Reconocimiento de Cartas mediante Procesamiento Clá
 
 # Objetivo General
 Desarrollar un sistema de reconocimiento automático de cartas de juego utilizando técnicas clásicas de visión artificial, sin emplear redes neuronales ni aprendizaje profundo. 
+
 El objetivo es identificar una o varias cartas presentes en una escena controlada.
 
 # Requisitos y Condiciones
@@ -53,7 +54,7 @@ Entregables
 
 
 # Sistema de Puntuación (Total: 10 + 2 ptos)
-Reconocimiento básico (obligatorio): Identificación correcta de una carta en la escena (número y palo).	Se presentan 10 cartas a reconocer, cada una de ellas en distintas posiciones y orientaciones. 
-Múltiples cartas	Identificación simultánea de varias cartas en la misma imagen.	+1 pts. Hasta 3 intentos. Puntúa el mejor.
-Oclusiones parciales	Capacidad para reconocer cartas parcialmente tapadas.	+1 pts. Hasta 3 intentos. Puntúa el mejor.
-Diseño y documentación	Claridad en el código, explicación técnica, justificación de decisiones. hasta -5 puntos de no presentarse en tiempo y formato adecuados.
+* Reconocimiento básico (obligatorio): Identificación correcta de una carta en la escena (número y palo).	Se presentan 10 cartas a reconocer, cada una de ellas en distintas posiciones y orientaciones. 
+* Múltiples cartas	Identificación simultánea de varias cartas en la misma imagen.	+1 pts. Hasta 3 intentos. Puntúa el mejor.
+* Oclusiones parciales	Capacidad para reconocer cartas parcialmente tapadas.	+1 pts. Hasta 3 intentos. Puntúa el mejor.
+* Diseño y documentación	Claridad en el código, explicación técnica, justificación de decisiones. hasta -5 puntos de no presentarse en tiempo y formato adecuados.
