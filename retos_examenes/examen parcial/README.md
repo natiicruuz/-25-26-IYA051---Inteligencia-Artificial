@@ -50,11 +50,11 @@ Entregables
       - Secuencialización de las operaciones realizadas sobre las imágenes con explicación de las configuraciones de cada una de las funciones utilizadas y el porqué de cada parámetro.
     - Otras tareas realizadas
 - Código fuente documentado.
-- Incluir si se utiliza: Link de Base de datos para pruebas.
+- Incluir si se utiliza: Link de Base de datos para pruebas [link debe ser al Gogle Drive de la cuenta de alumno].
 
 
 # Sistema de Puntuación (Total: 10 + 2 ptos)
 * Reconocimiento básico (obligatorio): Identificación correcta de una carta en la escena (número y palo).	Se presentan 10 cartas a reconocer, cada una de ellas en distintas posiciones y orientaciones. 
-* Múltiples cartas	Identificación simultánea de varias cartas en la misma imagen.	+1 pts. Hasta 3 intentos. Puntúa el mejor.
-* Oclusiones parciales	Capacidad para reconocer cartas parcialmente tapadas.	+1 pts. Hasta 3 intentos. Puntúa el mejor.
-* Diseño y documentación	Claridad en el código, explicación técnica, justificación de decisiones. hasta -5 puntos de no presentarse en tiempo y formato adecuados.
+* Múltiples cartas	Identificación simultánea de varias cartas en la misma imagen.	+1 pts. Hasta 3 intentos. Puntúa el mejor, proporcional al número de aciertos respecto del total.
+* Oclusiones parciales	Capacidad para reconocer cartas parcialmente tapadas.	+1 pts. Hasta 3 intentos. Puntúa el mejor, proporcional al número de aciertos respecto del total.
+* Diseño y documentación: Claridad en el código, explicación técnica, justificación de decisiones. hasta -5 puntos de no presentarse en tiempo y formato adecuados.
