@@ -53,8 +53,9 @@ Entregables
 - Incluir si se utiliza: Link de Base de datos para pruebas [link debe ser al Gogle Drive de la cuenta de alumno].
 
 
-# Sistema de Puntuación (Total: 10 + 2 ptos)
+# Sistema de Puntuación (Total: 10 + 3 ptos)
 * Reconocimiento básico (obligatorio): Identificación correcta de una carta en la escena (número y palo).	Se presentan 10 cartas a reconocer, cada una de ellas en distintas posiciones y orientaciones. 
 * Múltiples cartas	Identificación simultánea de varias cartas en la misma imagen.	+1 pts. Hasta 3 intentos. Puntúa el mejor, proporcional al número de aciertos respecto del total.
 * Oclusiones parciales	Capacidad para reconocer cartas parcialmente tapadas.	+1 pts. Hasta 3 intentos. Puntúa el mejor, proporcional al número de aciertos respecto del total.
+* Además de lo propuesto: Detección en ángulo de visión en torno a 45º prespecto al plano de las cartas (distorsión en cartas), con zonas de fondo diferentes al fondo verde del tapete. +1 pts. Con 5 intentos.
 * Diseño y documentación: Claridad en el código, explicación técnica, justificación de decisiones. hasta -5 puntos de no presentarse en tiempo y formato adecuados.
