@@ -8,11 +8,11 @@ URL_STREAM = 'rtsp://172.20.10.8:8080/h264.sdp'
 cap = cv2.VideoCapture(URL_STREAM, cv2.CAP_FFMPEG)
 
 cv2.namedWindow('Calibracion HSV')
-cv2.createTrackbar('H_min', 'Calibracion HSV', 38, 179, nothing)
-cv2.createTrackbar('H_max', 'Calibracion HSV', 75, 179, nothing)
-cv2.createTrackbar('S_min', 'Calibracion HSV', 50, 255, nothing)
+cv2.createTrackbar('H_min', 'Calibracion HSV', 0, 179, nothing) 
+cv2.createTrackbar('H_max', 'Calibracion HSV', 143, 179, nothing) 
+cv2.createTrackbar('S_min', 'Calibracion HSV', 169, 255, nothing) 
 cv2.createTrackbar('S_max', 'Calibracion HSV', 255, 255, nothing)
-cv2.createTrackbar('V_min', 'Calibracion HSV', 50, 255, nothing)
+cv2.createTrackbar('V_min', 'Calibracion HSV', 0, 255, nothing)
 cv2.createTrackbar('V_max', 'Calibracion HSV', 255, 255, nothing)
 
 while True:
