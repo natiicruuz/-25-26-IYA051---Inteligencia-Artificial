@@ -1,4 +1,4 @@
-# Reto 04
+# Reto 04 - Simuladores (II) + algoritmos
 
 Tema: Árboles de decisión y la sentencia IF then Else
 
@@ -8,4 +8,6 @@ Actividades sugeridas:
 - Implementar algoritmo de árbol manualmente (pequeño ejemplo).
 - Convertir el árbol a reglas IF-THEN-ELSE.
 - Comparar con una implementación de librería.
+- Simular un robot moviendose en mapa
+- Pathplanning y Pathfollowing: recta, niebla, obstaculos, estrategias, A*, D*
 
