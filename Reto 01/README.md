@@ -1,4 +1,4 @@
-# Reto 01
+# Reto 01 - Definiendo "Inteligencia"+"Artificial"
 
 Tema: Definiendo inteligencia artificial
 
