@@ -18,7 +18,7 @@ CARD_HEIGHT = 300
 
 # Región de Interés (ROI) para el valor y palo en la esquina superior izquierda
 # Formato: (x_inicio, y_inicio, ancho, alto)
-ROI_CORNER_VALUE = (5, 5, 60, 100)   # ROI más grande para captar valor completo
+ROI_CORNER_VALUE = (10, 10, 50, 90)  # Más pequeña
 ROI_CORNER_SUIT = (10, 60, 40, 40)   # ROI específico para el símbolo del palo
 
 # ============================================================================
@@ -66,7 +66,7 @@ TEMPLATE_SUIT_SIZE = (40, 40)    # Ancho x Alto para símbolos de palos
 TEMPLATE_MATCHING_METHOD = 'TM_CCOEFF_NORMED'
 
 # Umbral mínimo para considerar un match válido (0.0 a 1.0)
-TEMPLATE_MATCH_THRESHOLD = 0.6
+TEMPLATE_MATCH_THRESHOLD = 0.5
 
 # ============================================================================
 # CLASIFICACIÓN Y MACHINE LEARNING

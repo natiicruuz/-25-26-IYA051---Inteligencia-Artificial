@@ -160,10 +160,10 @@ class CardRecognitionSystem:
                         # Fondo semi-transparente para el texto
                         (w, h), _ = cv2.getTextSize(texto, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)
                         cv2.rectangle(frame, (cx - w//2 - 5, cy - h - 10), 
-                                     (cx + w//2 + 5, cy + 5), (0, 0, 0), -1)
+                                    (cx + w//2 + 5, cy + 5), (0, 0, 0), -1)
                         
                         cv2.putText(frame, texto, (cx - w//2, cy),
-                                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, COLOR_WHITE, 2)
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, COLOR_WHITE, 2)
                         
                         # Actualizar estadísticas
                         self.session_stats['cartas_detectadas'].add(result['carta'])
