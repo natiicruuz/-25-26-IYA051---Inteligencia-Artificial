@@ -75,7 +75,7 @@ def classify_card(warped_card, debug=False):
     }
     
     # 1. Auto-rotación de la carta
-    warped_card = auto_rotate_card(warped_card)
+    # warped_card = auto_rotate_card(warped_card)
     
     # 2. Extraer ROIs
     roi_valor = extract_roi_region(warped_card, ROI_CORNER_VALUE)
@@ -103,22 +103,32 @@ def classify_card(warped_card, debug=False):
             print(f"   {valor}: {score:.3f}")
     
     # 5. Template matching para palo
+
+    # Mostrar ROI del palo si está en debug
+    if debug:
+        roi_palo_display = cv2.resize(roi_palo, (200, 200))
+        cv2.imshow('DEBUG: ROI Palo en classification.py', roi_palo_display)
+        cv2.waitKey(1000)
+
     scores_palos = match_suit_templates(roi_palo)
+
+    for palo, score in sorted(scores_palos.items(), key=lambda x: x[1], reverse=True):
+        print(f"   {palo}: {score:.3f}")
+
     mejor_palo, confianza_palo = get_best_match(scores_palos, TEMPLATE_MATCH_THRESHOLD)
-    
+
     result['palo'] = mejor_palo
     result['confianza_palo'] = confianza_palo
-    
+
     if debug and scores_palos:
-        print(f"\n📊 Scores de palos:")
         for palo, score in sorted(scores_palos.items(), key=lambda x: x[1], reverse=True):
             print(f"   {palo}: {score:.3f}")
-    
-    # 6. Validación por reglas lógicas
-    if mejor_valor is None or mejor_palo is None:
-        if debug:
-            print("\n❌ No se pudo identificar valor o palo")
-        return result
+            
+        # 6. Validación por reglas lógicas
+        if mejor_valor is None or mejor_palo is None:
+            if debug:
+                print("\n❌ No se pudo identificar valor o palo")
+            return result
     
     # REGLA 1: Validar coherencia entre color detectado y palo
     color_esperado = SUIT_COLORS.get(mejor_palo)

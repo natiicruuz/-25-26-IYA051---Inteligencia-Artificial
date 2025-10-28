@@ -18,8 +18,8 @@ CARD_HEIGHT = 300
 
 # Región de Interés (ROI) para el valor y palo en la esquina superior izquierda
 # Formato: (x_inicio, y_inicio, ancho, alto)
-ROI_CORNER_VALUE = (10, 10, 50, 90)  # Más pequeña
-ROI_CORNER_SUIT = (10, 60, 40, 40)   # ROI específico para el símbolo del palo
+ROI_CORNER_VALUE = (2, 5, 40, 40)   # Actual
+ROI_CORNER_SUIT = (5, 50, 40, 40)  # Más abajo 
 
 # ============================================================================
 # CALIBRACIÓN DE COLORES HSV (RESULTADO DE FASE 2)
