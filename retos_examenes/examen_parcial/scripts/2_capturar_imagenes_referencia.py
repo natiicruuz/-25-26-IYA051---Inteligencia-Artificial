@@ -173,7 +173,7 @@ def obtener_siguiente_numero(etiqueta):
 
 def capturar_imagenes_referencia():
     """Función principal de captura."""
-    
+
     mostrar_instrucciones()
     
     # Conectar al stream RTSP
@@ -244,6 +244,8 @@ def capturar_imagenes_referencia():
             mostrar_progreso()
         
         elif key == ord('s'):
+            print("\n🔍 DEBUG: Tecla 's' presionada")
+            
             # Verificar cooldown
             tiempo_actual = time.time()
             if tiempo_actual - ultimo_capture < CAPTURE_COOLDOWN:
@@ -255,44 +257,60 @@ def capturar_imagenes_referencia():
                 print("❌ No hay carta detectada. Coloca una carta sobre el tapete.")
                 continue
             
+            print("✅ Carta detectada, solicitando etiqueta...")
+            
             # Solicitar etiqueta
             print("\n" + "-" * 60)
             etiqueta = input("📝 Introduce la etiqueta (ejemplo: AS_PICAS): ").upper().strip()
             
+            print(f"🔍 DEBUG: Etiqueta recibida: '{etiqueta}'")
+            
             # Validar etiqueta
             if not validar_etiqueta(etiqueta):
+                print("❌ Etiqueta inválida")
                 continue
+            
+            print("✅ Etiqueta válida")
             
             # Obtener número siguiente
             numero = obtener_siguiente_numero(etiqueta)
+            print(f"🔍 DEBUG: Número asignado: {numero}")
             
             # Guardar imagen
             filename = f"{etiqueta}_{numero}.jpg"
             filepath = os.path.join(IMAGENES_REFERENCIA_DIR, filename)
             
-            cv2.imwrite(filepath, warped_card)
+            print(f"🔍 DEBUG: Intentando guardar en: {filepath}")
+            print(f"🔍 DEBUG: Directorio existe: {os.path.exists(IMAGENES_REFERENCIA_DIR)}")
             
-            print(f"✅ Guardado: {filename}")
-            print(f"   Ruta: {filepath}")
+            try:
+                resultado = cv2.imwrite(filepath, warped_card)
+                if resultado:
+                    print(f"✅ Guardado exitosamente: {filename}")
+                    print(f"   Ruta completa: {filepath}")
+                else:
+                    print(f"❌ cv2.imwrite retornó False - No se pudo guardar")
+            except Exception as e:
+                print(f"❌ Error al guardar: {e}")
             
             # Actualizar timestamp
             ultimo_capture = tiempo_actual
             
             # Mostrar progreso actualizado
             mostrar_progreso()
-    
-    # Limpieza
-    cap.release()
-    cv2.destroyAllWindows()
-    
-    print("\n" + "=" * 60)
-    print("RESUMEN FINAL")
-    print("=" * 60)
-    mostrar_progreso()
-    print(f"\n📁 Imágenes guardadas en: {IMAGENES_REFERENCIA_DIR}")
-    print("\n📌 SIGUIENTE PASO:")
-    print("   Ejecuta: python3 scripts/3_crear_templates.py")
-    print("=" * 60)
+            
+            # Limpieza
+            # cap.release()
+            # cv2.destroyAllWindows()
+            
+            print("\n" + "=" * 60)
+            print("RESUMEN FINAL")
+            print("=" * 60)
+            mostrar_progreso()
+            print(f"\n📁 Imágenes guardadas en: {IMAGENES_REFERENCIA_DIR}")
+            print("\n📌 SIGUIENTE PASO:")
+            print("   Ejecuta: python3 scripts/3_crear_templates.py")
+            print("=" * 60)
 
 
 if __name__ == "__main__":
