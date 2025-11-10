@@ -1,4 +1,4 @@
-# Reto 06
+# Reto 06 - Planteamiento inicial de cara al examen parcial
 
 Tema: Visión artificial clásica
 
@@ -9,3 +9,6 @@ Actividades sugeridas:
 - trabajar espacios de color para los brillos y colores.
 - detectar contornos.
 - detectar objetos --> segmentacion.
+
+Imagen para trabajar:
+
