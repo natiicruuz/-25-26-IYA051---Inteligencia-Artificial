@@ -58,7 +58,7 @@ class TemplateLibrary:
             if template is not None:
                 # Redimensionar al tamaño estándar
                 template = cv2.resize(template, TEMPLATE_VALUE_SIZE)
-                self.value_templates[valor] = template
+                self.value_templates[valor] = template  
                 print(f"   ✅ Cargado: {valor}")
             else:
                 print(f"   ❌ Error al cargar: {valor}")
@@ -76,7 +76,7 @@ class TemplateLibrary:
             if template is not None:
                 # Redimensionar al tamaño estándar
                 template = cv2.resize(template, TEMPLATE_SUIT_SIZE)
-                self.suit_templates[palo] = template
+                self.suit_templates[palo] = template  # ← IMAGEN ÚNICA, NO LISTA
                 print(f"   ✅ Cargado: {palo}")
             else:
                 print(f"   ❌ Error al cargar: {palo}")
@@ -89,7 +89,6 @@ class TemplateLibrary:
         else:
             print("\n❌ No se cargaron suficientes templates")
             return False
-    
     def get_value_template(self, valor):
         """Retorna el template de un valor específico."""
         return self.value_templates.get(valor)
@@ -162,15 +161,15 @@ def match_template(roi, template, method=cv2.TM_CCOEFF_NORMED):
     return score, location
 
 
-def match_template_multiscale(roi, template, scales=[0.8, 0.9, 1.0, 1.1, 1.2]):
+def match_template_multiscale(roi, template, scales=[0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3]):
     """
     Template matching con múltiples escalas.
     
     Útil cuando el tamaño del símbolo en la carta puede variar.
     
     Args:
-        roi (np.ndarray): Región de interés (grayscale)
-        template (np.ndarray): Template a buscar (grayscale)
+        roi (np.ndarray): Región de interés
+        template (np.ndarray): Template a buscar
         scales (list): Lista de factores de escala a probar
     
     Returns:
@@ -204,7 +203,6 @@ def match_template_multiscale(roi, template, scales=[0.8, 0.9, 1.0, 1.1, 1.2]):
             best_location = location
     
     return best_score, best_scale, best_location
-
 
 def match_value_templates(roi_valor):
     """
@@ -249,51 +247,70 @@ def match_value_templates(roi_valor):
     
     return scores
 
+def match_suit_with_rotation(roi_palo, template):
+    """Prueba el template en múltiples rotaciones de 45°."""
+    max_score = 0.0
+    
+    for angulo in [0, 45, 90, 135, 180, 225, 270, 315]:
+        # Rotar ROI
+        (h, w) = roi_palo.shape[:2]
+        centro = (w // 2, h // 2)
+        M = cv2.getRotationMatrix2D(centro, angulo, 1.0)
+        roi_rotada = cv2.warpAffine(roi_palo, M, (w, h))
+        
+        # Matching
+        score, _, _ = match_template_multiscale(roi_rotada, template)
+        max_score = max(max_score, score)
+    
+    return max_score
 
 def match_suit_templates(roi_palo):
     """
-    Compara ROI del palo con todos los templates de palos.
-    
-    Args:
-        roi_palo (np.ndarray): ROI con el símbolo del palo (BGR o grayscale)
-    
-    Returns:
-        dict: {palo: score} con las puntuaciones de cada palo
-    
-    Ejemplo:
-        {'PICAS': 0.88, 'CORAZONES': 0.34, 'DIAMANTES': 0.29, 'TREBOLES': 0.41}
+    Compara ROI del palo con todos los templates.
+    USA COLOR como filtro inicial.
     """
     library = get_template_library()
     
     if not library.is_loaded():
-        print("❌ Templates no cargados")
         return {}
     
-    # Convertir a grayscale si es necesario
+    # PRIMERO: Detectar color
+    from src.vision.preprocessing import is_red_card
+    es_roja = is_red_card(roi_palo)
+    
+    # Convertir a grayscale y binarizar
     if len(roi_palo.shape) == 3:
         roi_gray = cv2.cvtColor(roi_palo, cv2.COLOR_BGR2GRAY)
     else:
         roi_gray = roi_palo.copy()
     
-    # Binarizar
     _, roi_thresh = cv2.threshold(roi_gray, 150, 255, cv2.THRESH_BINARY_INV)
     
     scores = {}
     
+    # FILTRAR palos según color detectado
+    if es_roja:
+        palos_a_probar = ['CORAZONES', 'DIAMANTES']
+    else:
+        palos_a_probar = ['PICAS', 'TREBOLES']
+    
+    # Solo hacer matching con los palos del color correcto
     for palo in CARD_SUITS:
-        template = library.get_suit_template(palo)
-        
-        if template is None:
+        if palo in palos_a_probar:
+            template = library.get_suit_template(palo)
+            
+            if template is None:
+                scores[palo] = 0.0
+                continue
+            
+            # Matching multi-escala
+            score, _, _ = match_template_multiscale(roi_thresh, template)
+            scores[palo] = score
+        else:
+            # Palo del color incorrecto: score = 0
             scores[palo] = 0.0
-            continue
-        
-        # Matching multi-escala
-        score, _, _ = match_template_multiscale(roi_thresh, template)
-        scores[palo] = score
     
     return scores
-
-
 def get_best_match(scores, threshold=TEMPLATE_MATCH_THRESHOLD):
     """
     Obtiene el mejor match de un diccionario de scores.

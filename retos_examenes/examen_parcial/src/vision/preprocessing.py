@@ -47,16 +47,15 @@ def order_points(pts):
     
     # La suma de coordenadas identifica esquinas opuestas
     s = pts.sum(axis=1)
-    rect[0] = pts[np.argmin(s)]  # Top-Left (mínima suma x+y)
-    rect[2] = pts[np.argmax(s)]  # Bottom-Right (máxima suma x+y)
+    rect[0] = pts[np.argmin(s)]  # Top-Left (mínima suma)
+    rect[2] = pts[np.argmax(s)]  # Bottom-Right (máxima suma)
     
-    # La diferencia identifica las otras dos esquinas
+    # Diferencia de coordenadas
     diff = np.diff(pts, axis=1)
-    rect[1] = pts[np.argmin(diff)]  # Top-Right (mínima diferencia y-x)
-    rect[3] = pts[np.argmax(diff)]  # Bottom-Left (máxima diferencia y-x)
+    rect[1] = pts[np.argmin(diff)]  # Top-Right (mínima diferencia)
+    rect[3] = pts[np.argmax(diff)]  # Bottom-Left (máxima diferencia)
     
     return rect
-
 
 def preprocess_and_warp(frame, debug=False):
     """
@@ -87,60 +86,36 @@ def preprocess_and_warp(frame, debug=False):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     blurred = cv2.GaussianBlur(hsv, BLUR_KERNEL_SIZE, BLUR_SIGMA)
     
-    if debug:
-        debug_images['hsv'] = hsv
-        debug_images['blurred'] = blurred
-    
     # 2. Segmentación por color
     mask_fondo = cv2.inRange(blurred, LOWER_COLOR_FONDO, UPPER_COLOR_FONDO)
     mask_carta = cv2.bitwise_not(mask_fondo)
     
-    if debug:
-        debug_images['mask_fondo'] = mask_fondo
-        debug_images['mask_carta'] = mask_carta
-    
-    # 3. Operaciones morfológicas para limpiar ruido
+    # 3. Operaciones morfológicas
     kernel = np.ones((3, 3), np.uint8)
     mask_carta = cv2.morphologyEx(mask_carta, cv2.MORPH_CLOSE, kernel)
     mask_carta = cv2.morphologyEx(mask_carta, cv2.MORPH_OPEN, kernel)
-    
-    if debug:
-        debug_images['mask_cleaned'] = mask_carta
     
     # 4. Detección de contornos
     contours, _ = cv2.findContours(mask_carta, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     if not contours:
-        if debug:
-            return None, None, debug_images
         return None, None, {}
     
-    # Encontrar el contorno más grande
     largest_contour = max(contours, key=cv2.contourArea)
     
     # Filtrar por área mínima
     if cv2.contourArea(largest_contour) < MIN_CONTOUR_AREA:
-        if debug:
-            return None, largest_contour, debug_images
         return None, largest_contour, {}
     
     # 5. Aproximación poligonal
     epsilon = EPSILON_FACTOR * cv2.arcLength(largest_contour, True)
     approx = cv2.approxPolyDP(largest_contour, epsilon, True)
     
-    if debug:
-        temp_frame = frame.copy()
-        cv2.drawContours(temp_frame, [approx], -1, (0, 255, 0), 2)
-        debug_images['approx_polygon'] = temp_frame
-    
-    # 6. Transformación de perspectiva (solo si encontramos 4 vértices)
+    # 6. Transformación de perspectiva
     if len(approx) == 4:
         points = order_points(approx)
         
-        # Puntos fuente (esquinas de la carta en la imagen)
         pts1 = np.float32(points)
-        
-        # Puntos destino (rectángulo normalizado)
         pts2 = np.float32([
             [0, 0],
             [CARD_WIDTH, 0],
@@ -148,24 +123,12 @@ def preprocess_and_warp(frame, debug=False):
             [0, CARD_HEIGHT]
         ])
         
-        # Calcular matriz de transformación
         M = cv2.getPerspectiveTransform(pts1, pts2)
-        
-        # Aplicar transformación
         warped = cv2.warpPerspective(frame, M, (CARD_WIDTH, CARD_HEIGHT))
-        
-        if debug:
-            debug_images['warped'] = warped
-            return warped, largest_contour, debug_images
         
         return warped, largest_contour, {}
     
-    # Si no encontramos 4 vértices, no podemos normalizar
-    if debug:
-        return None, largest_contour, debug_images
     return None, largest_contour, {}
-
-
 def detect_multiple_cards(frame, debug=False):
     """
     Detecta y normaliza MÚLTIPLES cartas en el mismo frame.
@@ -213,7 +176,7 @@ def detect_multiple_cards(frame, debug=False):
             continue
         
         # Aproximación poligonal
-        epsilon = EPSILON_FACTOR * cv2.arcLength(contour, True)
+        epsilon = 0.02 * cv2.arcLength(contour, True) 
         approx = cv2.approxPolyDP(contour, epsilon, True)
         
         # Solo procesar si es un cuadrilátero
@@ -306,31 +269,22 @@ def is_red_card(roi):
         bool: True si es rojo, False si es negro
     
     Método:
-        Analiza el espacio HSV. El rojo tiene dos rangos en HSV:
-        - Rango bajo: H=0-10 (rojo hacia naranja)
-        - Rango alto: H=160-179 (magenta hacia rojo)
+        Analiza diferencias absolutas entre canales BGR.
+        Rojo debe ser al menos 30 puntos mayor que verde y 40 mayor que azul.
     """
-    from config.settings import LOWER_RED_HSV_1, UPPER_RED_HSV_1, LOWER_RED_HSV_2, UPPER_RED_HSV_2
+    # Calcular promedio de cada canal BGR
+    mean_b = np.mean(roi[:,:,0])  # Azul
+    mean_g = np.mean(roi[:,:,1])  # Verde
+    mean_r = np.mean(roi[:,:,2])  # Rojo
     
-    hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+    # Calcular diferencias
+    diff_r_g = mean_r - mean_g
+    diff_r_b = mean_r - mean_b
     
-    # Crear máscaras para ambos rangos de rojo
-    mask_red_1 = cv2.inRange(hsv_roi, LOWER_RED_HSV_1, UPPER_RED_HSV_1)
-    mask_red_2 = cv2.inRange(hsv_roi, LOWER_RED_HSV_2, UPPER_RED_HSV_2)
+    # Rojo debe ser significativamente mayor
+    es_rojo = (diff_r_g > 30) and (diff_r_b > 40)
     
-    # Combinar ambas máscaras
-    mask_red = cv2.bitwise_or(mask_red_1, mask_red_2)
-    
-    # Contar píxeles rojos
-    red_pixels = np.sum(mask_red > 0)
-    total_pixels = roi.shape[0] * roi.shape[1]
-    
-    # Si más del 20% de los píxeles son rojos, es una carta roja
-    red_percentage = red_pixels / total_pixels
-    
-    return red_percentage > 0.20
-
-
+    return es_rojo
 def binarize_roi(roi, threshold=150):
     """
     Convierte ROI a imagen binaria para template matching.

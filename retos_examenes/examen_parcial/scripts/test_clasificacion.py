@@ -130,6 +130,10 @@ template_valor = library.get_value_template(mejor_valor)
 template_palo = library.get_suit_template(mejor_palo)
 
 if template_valor is not None:
+    # Si es lista, tomar el primero
+    if isinstance(template_valor, list):
+        template_valor = template_valor[0]
+    
     template_valor_grande = cv2.resize(template_valor, (150, 200))
     cv2.imshow(f'TEMPLATE: {mejor_valor}', template_valor_grande)
 

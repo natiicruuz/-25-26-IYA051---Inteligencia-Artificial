@@ -28,13 +28,13 @@ ROI_CORNER_SUIT = (5, 50, 40, 40)  # Más abajo
 # IMPORTANTE: Estos valores son para DETECTAR EL TAPETE (fondo verde)
 
 # VALORES ACTUALIZADOS DESDE TU CALIBRACIÓN:
-LOWER_COLOR_FONDO = np.array([0, 169, 0])
-UPPER_COLOR_FONDO = np.array([143, 255, 255])
+LOWER_COLOR_FONDO = np.array([35, 153, 0])
+UPPER_COLOR_FONDO = np.array([105, 255, 255])
 
 # Valores HSV para detectar ROJOS (corazones y diamantes)
-LOWER_RED_HSV_1 = np.array([0, 50, 50])    # Rojo en rango bajo
-UPPER_RED_HSV_1 = np.array([10, 255, 255])
-LOWER_RED_HSV_2 = np.array([160, 50, 50])  # Rojo en rango alto
+LOWER_RED_HSV_1 = np.array([0, 30, 30])    # Rojo en rango bajo
+UPPER_RED_HSV_1 = np.array([15, 255, 255])
+LOWER_RED_HSV_2 = np.array([150, 30, 30])  # Menos saturación
 UPPER_RED_HSV_2 = np.array([179, 255, 255])
 
 # ============================================================================
@@ -51,7 +51,7 @@ THRESHOLD_MAX = 255        # Valor máximo en imagen binaria
 
 # Filtros de contornos
 MIN_CONTOUR_AREA = 5000    # Área mínima para considerar una carta válida
-EPSILON_FACTOR = 0.04      # Factor para aproximación poligonal (4% del perímetro)
+EPSILON_FACTOR = 0.03      # Factor para aproximación poligonal (4% del perímetro)
 
 # ============================================================================
 # TEMPLATE MATCHING
@@ -66,7 +66,7 @@ TEMPLATE_SUIT_SIZE = (40, 40)    # Ancho x Alto para símbolos de palos
 TEMPLATE_MATCHING_METHOD = 'TM_CCOEFF_NORMED'
 
 # Umbral mínimo para considerar un match válido (0.0 a 1.0)
-TEMPLATE_MATCH_THRESHOLD = 0.5
+TEMPLATE_MATCH_THRESHOLD = 0.35
 
 # ============================================================================
 # CLASIFICACIÓN Y MACHINE LEARNING
