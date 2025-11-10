@@ -10,5 +10,9 @@ Actividades sugeridas:
 - detectar contornos.
 - detectar objetos --> segmentacion.
 
-Imagen para trabajar:
+Imágenes para trabajar: Campus virtual > Ejercicios > Vision Artificial > Vision Artificial clasica (tradicional)
+20251010_111257.jpg
+20251010_114845.jpg
+Vision_Artificial_Clasica_RETO_Quitarfondo.ipynb
+
 
