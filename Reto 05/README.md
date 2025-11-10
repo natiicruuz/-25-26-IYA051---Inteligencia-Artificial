@@ -1,4 +1,4 @@
-# Reto 05
+# Reto 05 - Simuladores (III) + algoritmos y estrategias inteligentes. Estrategias multiagente.
 
 Tema: GNC de robots: Pathplanning y Pathfollowing
 
