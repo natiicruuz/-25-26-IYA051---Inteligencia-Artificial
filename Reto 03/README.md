@@ -1,10 +1,23 @@
-# Reto 03
+# Reto 03 - La simulación en Ingeniería
 
-Tema: Árboles de decisión y la sentencia IF then Else
+Tema: Simuladores en IA
 
-Descripción: Fundamentos de árboles de decisión como estructura de decisión y su relación con reglas IF-THEN-ELSE. Objetivo: implementar y visualizar un árbol de decisión simple.
+Uso de simuladores para experimentar con agentes inteligentes (p. ej. OpenAI Gym, Webots, Gazebo). 
+Objetivo: configurar un entorno de simulación y ejecutar experimentos básicos.
+
+Los simuladores pueden ser todo lo realistas y complicados que queramos. Debemos ser prácticos y enfocarnos en las funcionalidades que queremos probar. 
+Es decir, orientarnos a validar nuestros prototipos. En el caso de esta asignatura los prototipos serán nuestros modelos de IA 
 
 Actividades sugeridas:
-- Implementar algoritmo de árbol manualmente (pequeño ejemplo).
-- Convertir el árbol a reglas IF-THEN-ELSE.
-- Comparar con una implementación de librería.
+- Crear un simulador para generar trayectorias entre dos puntos. Primero nos enfocamos en la linea recta.
+- ¿Qué pasa si añadimos obstáculos? Establecer estrategias para sortearlos. Emplea la estrategia más sencilla que se te ocurra en base a las lineas rectas anteriores.
+- ¿Como optimizar cuando hay varios obstáculos y muchas celdas a explorar? Prueba a implementar un A* [algoritmo A-estrella]
+
+
+
+Info del A*:
+https://csis.pace.edu/~benjamin/teaching/cs627/webfiles/Astar.pdf
+https://www.youtube.com/watch?v=-L-WgKMFuhE
+
+
+  
