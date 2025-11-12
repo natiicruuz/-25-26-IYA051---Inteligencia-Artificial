@@ -262,15 +262,11 @@ def is_red_card(roi):
     """
     Determina si el ROI contiene un símbolo rojo (Corazones o Diamantes).
     
-    Args:
-        roi (np.ndarray): Región de interés BGR
-    
     Returns:
         bool: True si es rojo, False si es negro
     
     Método:
         Analiza diferencias absolutas entre canales BGR.
-        Rojo debe ser al menos 30 puntos mayor que verde y 40 mayor que azul.
     """
     # Calcular promedio de cada canal BGR
     mean_b = np.mean(roi[:,:,0])  # Azul
@@ -281,8 +277,7 @@ def is_red_card(roi):
     diff_r_g = mean_r - mean_g
     diff_r_b = mean_r - mean_b
     
-    # Rojo debe ser significativamente mayor
-    es_rojo = (diff_r_g > 30) and (diff_r_b > 40)
+    es_rojo = (diff_r_g > 23) and (diff_r_b > 33)
     
     return es_rojo
 def binarize_roi(roi, threshold=150):
