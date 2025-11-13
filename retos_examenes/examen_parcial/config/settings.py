@@ -18,8 +18,8 @@ CARD_HEIGHT = 300
 
 # Región de Interés (ROI) para el valor y palo en la esquina superior izquierda
 # Formato: (x_inicio, y_inicio, ancho, alto)
-ROI_CORNER_VALUE = (2, 5, 40, 40)   # Actual
-ROI_CORNER_SUIT = (5, 50, 40, 40)  # Más abajo 
+ROI_CORNER_VALUE = (0, 3, 85, 50)  # más ancho para capturar "10" completo
+ROI_CORNER_SUIT = (5, 50, 40, 40)  # Sin cambios
 
 # ============================================================================
 # CALIBRACIÓN DE COLORES HSV (RESULTADO DE FASE 2)
@@ -58,7 +58,7 @@ EPSILON_FACTOR = 0.03      # Factor para aproximación poligonal (4% del períme
 # ============================================================================
 
 # Dimensiones de los templates
-TEMPLATE_VALUE_SIZE = (30, 50)   # Ancho x Alto para números/letras
+TEMPLATE_VALUE_SIZE = (30, 50)   #  Ancho x Alto 
 TEMPLATE_SUIT_SIZE = (40, 40)    # Ancho x Alto para símbolos de palos
 
 # Método de matching de OpenCV
@@ -211,8 +211,10 @@ def print_config_summary():
     print("=" * 60)
     print(f"RTSP URL: {RTSP_URL}")
     print(f"Dimensiones carta: {CARD_WIDTH}x{CARD_HEIGHT}")
+    print(f"ROI Valor: {ROI_CORNER_VALUE} (x, y, w, h)")  
     print(f"HSV Fondo: {LOWER_COLOR_FONDO} - {UPPER_COLOR_FONDO}")
     print(f"Clasificador: {CLASSIFIER_TYPE}")
+    print(f"Template Value Size: {TEMPLATE_VALUE_SIZE}") 
     print(f"Directorio datos: {TRAINING_DATA_DIR}")
     print(f"Modelo guardado en: {MODEL_PATH}")
     print("=" * 60)

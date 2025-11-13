@@ -260,24 +260,33 @@ def extract_roi_region(warped_card, roi_coords):
 
 def is_red_card(roi):
     """
-    Determina si el ROI contiene un símbolo rojo (Corazones o Diamantes).
-    
-    Returns:
-        bool: True si es rojo, False si es negro
-    
-    Método:
-        Analiza diferencias absolutas entre canales BGR.
+    Determina si el ROI contiene un símbolo rojo.
+    Método ratio MEJORADO con validación adicional.
     """
-    # Calcular promedio de cada canal BGR
-    mean_b = np.mean(roi[:,:,0])  # Azul
-    mean_g = np.mean(roi[:,:,1])  # Verde
-    mean_r = np.mean(roi[:,:,2])  # Rojo
+    mean_b = np.mean(roi[:,:,0])
+    mean_g = np.mean(roi[:,:,1])
+    mean_r = np.mean(roi[:,:,2])
     
-    # Calcular diferencias
+    # Evitar división por cero
+    if mean_b < 1 or mean_g < 1:
+        return False
+    
+    # Método 1: Ratio
+    ratio_r_g = mean_r / mean_g
+    ratio_r_b = mean_r / mean_b
+    criterio_ratio = (ratio_r_g > 1.03) and (ratio_r_b > 1.05)  # Más estricto
+    
+    # Método 2: Diferencia absoluta (para confirmar)
     diff_r_g = mean_r - mean_g
     diff_r_b = mean_r - mean_b
+    criterio_diff = (diff_r_g > 15) and (diff_r_b > 20)
     
-    es_rojo = (diff_r_g > 23) and (diff_r_b > 33)
+    # Método 3: Rojo absoluto debe ser alto
+    criterio_absoluto = mean_r > 210
+    
+    # Es rojo si cumple AL MENOS 2 de 3 criterios
+    votos = sum([criterio_ratio, criterio_diff, criterio_absoluto])
+    es_rojo = votos >= 2
     
     return es_rojo
 def binarize_roi(roi, threshold=150):
