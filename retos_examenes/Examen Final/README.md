@@ -1,6 +1,6 @@
-# Trabajo Final de Asignatura  
-## 051 - Inteligencia Artificial
+# Trabajo para el Examen Final de Asignatura: 051 - Inteligencia Artificial
 
+## Reto del examen final
 El trabajo consistirá en la realización de un software OCR con las siguientes características:
 
 - **Input:** archivo externo en formato Imagen: jpg, bmp, tiff, png… (mínimo 1 formato)  
@@ -17,7 +17,7 @@ El trabajo consistirá en la realización de un software OCR con las siguientes 
     - Identificar tablas y digitalizarlas a formato tabla (se puede dar el formato con algún lenguaje como HTML, LaTeX, Markdown, etc., dibujando las líneas o simplemente creando una estructura nodos y conexiones).
     - Detectar marcas, tags, códigos de barra, códigos QR… (no hace falta interpretarlos), sí guardarlos en archivos de imagen independiente.
     - Detectar alguna característica en imágenes para clasificarlas (ojos, caras, manos, elementos de paisajes, etc.).
-    - Características extra propuestas por el alumno: preguntar al profesor.
+    - Características extra propuestas por el alumno: **preguntar al profesor**.
 
 ---
 
