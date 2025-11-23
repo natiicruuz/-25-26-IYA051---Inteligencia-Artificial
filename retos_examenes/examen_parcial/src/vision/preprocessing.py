@@ -233,7 +233,7 @@ def visualize_detection(frame, contours, predictions=None, valid_contours=True):
             if predictions and i < len(predictions):
                 cx, cy = center
                 cv2.putText(output, predictions[i], (cx - 50, cy),
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
     else:
         # Lista simple de contornos
         for contour in contours:

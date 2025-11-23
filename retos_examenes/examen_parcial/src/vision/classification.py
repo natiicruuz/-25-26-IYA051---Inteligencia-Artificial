@@ -141,7 +141,7 @@ def classify_card(warped_card, debug=False):
         
         # Elegir el mejor palo negro (Picas o Tréboles)
         palos_negros = {'PICAS': scores_palos.get('PICAS', 0), 
-                       'TREBOLES': scores_palos.get('TREBOLES', 0)}
+                    'TREBOLES': scores_palos.get('TREBOLES', 0)}
         mejor_palo = max(palos_negros, key=palos_negros.get)
         confianza_palo = palos_negros[mejor_palo]
         result['palo'] = mejor_palo
@@ -155,7 +155,7 @@ def classify_card(warped_card, debug=False):
         
         # Elegir el mejor palo rojo (Corazones o Diamantes)
         palos_rojos = {'CORAZONES': scores_palos.get('CORAZONES', 0), 
-                      'DIAMANTES': scores_palos.get('DIAMANTES', 0)}
+                    'DIAMANTES': scores_palos.get('DIAMANTES', 0)}
         mejor_palo = max(palos_rojos, key=palos_rojos.get)
         confianza_palo = palos_rojos[mejor_palo]
         result['palo'] = mejor_palo
@@ -187,7 +187,7 @@ def classify_multiple_cards(cards_list, debug=False):
     
     Args:
         cards_list (list): Lista de tuplas (warped_card, contour, center) 
-                          de detect_multiple_cards()
+        de detect_multiple_cards()
         debug (bool): Modo debugging
     
     Returns:
@@ -297,9 +297,6 @@ def compare_classifications(result1, result2):
             result1['carta'] == result2['carta'])
 
 
-# ============================================================================
-# FUNCIONES DE ANÁLISIS Y DEBUGGING
-# ============================================================================
 
 def create_classification_report(results, output_path=None):
     """
@@ -443,13 +440,10 @@ def print_confusion_analysis(analysis):
             print(f"   {confusion}: {count} veces")
 
 
-# ============================================================================
-# FUNCIONES DE TEST
-# ============================================================================
 
 def test_classification():
     """Test sintético de clasificación."""
-    print("\n🧪 Test de clasificación (requiere templates cargados)...")
+    print("\n Test de clasificación (requiere templates cargados)...")
     
     from src.vision.template_matching import get_template_library
     

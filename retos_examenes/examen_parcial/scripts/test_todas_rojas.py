@@ -11,7 +11,7 @@ imagenes_dir = 'data/imagenes_referencia'
 imagenes = [f for f in os.listdir(imagenes_dir) if f.endswith('.jpg')]
 
 # Filtrar solo ROJAS (Corazones y Diamantes)
-rojas = [img for img in imagenes if 'CORAZONES' in img or 'DIAMANTES' in img]
+rojas = [img for img in imagenes if 'CORAZONES' in img or 'DIAMANTES' in img]  
 
 print(f"{'='*60}")
 print(f"VERIFICANDO DETECCIÓN DE COLOR EN {len(rojas)} CARTAS ROJAS")

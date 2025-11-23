@@ -1,6 +1,14 @@
 """
 Configuración global del proyecto de reconocimiento de cartas.
 Centraliza todas las constantes para facilitar ajustes.
+
+TÉCNICAS UTILIZADAS:
+    ✅ Visión artificial clásica
+    ✅ Template matching (correlación normalizada)
+    ✅ Segmentación por color HSV
+    ✅ Operaciones morfológicas
+    ❌ SIN Machine Learning
+    ❌ SIN Redes Neuronales
 """
 
 import numpy as np
@@ -8,9 +16,9 @@ import os
 
 RTSP_URL = 'rtsp://172.20.10.8:8080/h264.sdp'
 
-# ============================================================================
+
 # PARÁMETROS DE VISIÓN ARTIFICIAL
-# ============================================================================
+
 
 # Dimensiones normalizadas de la carta (en píxeles)
 CARD_WIDTH = 200
@@ -21,9 +29,9 @@ CARD_HEIGHT = 300
 ROI_CORNER_VALUE = (0, 3, 85, 50)  # más ancho para capturar "10" completo
 ROI_CORNER_SUIT = (5, 50, 40, 40)  # Sin cambios
 
-# ============================================================================
+
 # CALIBRACIÓN DE COLORES HSV (RESULTADO DE FASE 2)
-# ============================================================================
+
 # Estos valores deben ser actualizados después de ejecutar 1_calibrar_hsv.py
 # IMPORTANTE: Estos valores son para DETECTAR EL TAPETE (fondo verde)
 
@@ -37,9 +45,9 @@ UPPER_RED_HSV_1 = np.array([15, 255, 255])
 LOWER_RED_HSV_2 = np.array([150, 30, 30])  # Menos saturación
 UPPER_RED_HSV_2 = np.array([179, 255, 255])
 
-# ============================================================================
+
 # PROCESAMIENTO DE IMAGEN
-# ============================================================================
+
 
 # Parámetros de GaussianBlur
 BLUR_KERNEL_SIZE = (5, 5)
@@ -51,14 +59,14 @@ THRESHOLD_MAX = 255        # Valor máximo en imagen binaria
 
 # Filtros de contornos
 MIN_CONTOUR_AREA = 5000    # Área mínima para considerar una carta válida
-EPSILON_FACTOR = 0.03      # Factor para aproximación poligonal (4% del perímetro)
+EPSILON_FACTOR = 0.03      # Factor para aproximación poligonal (3% del perímetro)
 
-# ============================================================================
-# TEMPLATE MATCHING
-# ============================================================================
+
+# TEMPLATE MATCHING (TÉCNICA PRINCIPAL DE CLASIFICACIÓN)
+
 
 # Dimensiones de los templates
-TEMPLATE_VALUE_SIZE = (30, 50)   #  Ancho x Alto 
+TEMPLATE_VALUE_SIZE = (30, 50)   # Ancho x Alto para valores (AS, 2-10, J, Q, K)
 TEMPLATE_SUIT_SIZE = (40, 40)    # Ancho x Alto para símbolos de palos
 
 # Método de matching de OpenCV
@@ -68,51 +76,28 @@ TEMPLATE_MATCHING_METHOD = 'TM_CCOEFF_NORMED'
 # Umbral mínimo para considerar un match válido (0.0 a 1.0)
 TEMPLATE_MATCH_THRESHOLD = 0.35
 
-# ============================================================================
-# CLASIFICACIÓN Y MACHINE LEARNING
-# ============================================================================
 
-# Tipo de clasificador a usar
-# Opciones: 'decision_tree', 'random_forest', 'knn'
-CLASSIFIER_TYPE = 'random_forest'  # CAMBIADO: Random Forest es mejor que Decision Tree
-
-# Parámetros del Random Forest
-RF_N_ESTIMATORS = 100       # Número de árboles
-RF_MAX_DEPTH = 15           # Profundidad máxima de cada árbol
-RF_RANDOM_STATE = 42        # Semilla para reproducibilidad
-
-# Parámetros del Decision Tree (si se usa)
-DT_MAX_DEPTH = 10
-DT_RANDOM_STATE = 42
-
-# Validación cruzada
-CV_FOLDS = 5                # Número de folds para cross-validation
-
-# ============================================================================
 # RUTAS Y DIRECTORIOS
-# ============================================================================
+
 
 # Directorio base del proyecto
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Directorios de datos
 DATA_DIR = os.path.join(BASE_DIR, 'data')
-TRAINING_DATA_DIR = os.path.join(DATA_DIR, 'training_data_cards')
+REFERENCE_DIR = os.path.join(DATA_DIR, 'imagenes_referencia')
 TEMPLATES_DIR = os.path.join(DATA_DIR, 'templates')
 TEMPLATES_VALUES_DIR = os.path.join(TEMPLATES_DIR, 'valores')
 TEMPLATES_SUITS_DIR = os.path.join(TEMPLATES_DIR, 'palos')
 
-# Archivo del modelo entrenado
-MODEL_PATH = os.path.join(DATA_DIR, 'modelo_cartas.pkl')
-
 # Crear directorios si no existen
-for directory in [DATA_DIR, TRAINING_DATA_DIR, TEMPLATES_DIR, 
-                  TEMPLATES_VALUES_DIR, TEMPLATES_SUITS_DIR]:
+for directory in [DATA_DIR, REFERENCE_DIR, TEMPLATES_DIR, 
+                TEMPLATES_VALUES_DIR, TEMPLATES_SUITS_DIR]:
     os.makedirs(directory, exist_ok=True)
 
-# ============================================================================
+
 # DEFINICIÓN DE CARTAS
-# ============================================================================
+
 
 # Valores de las cartas (en orden)
 CARD_VALUES = ['AS', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
@@ -131,9 +116,9 @@ SUIT_COLORS = {
 # Todas las cartas posibles (52)
 ALL_CARDS = [f"{value}_{suit}" for value in CARD_VALUES for suit in CARD_SUITS]
 
-# ============================================================================
+
 # PARÁMETROS DE VISUALIZACIÓN
-# ============================================================================
+
 
 # Colores para dibujar (formato BGR)
 COLOR_GREEN = (0, 255, 0)      # Verde para contornos válidos
@@ -151,9 +136,9 @@ FONT_THICKNESS = 2
 DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 600
 
-# ============================================================================
+
 # CONFIGURACIÓN DE CAPTURA
-# ============================================================================
+
 
 # Tiempo mínimo entre capturas (segundos)
 CAPTURE_COOLDOWN = 0.5
@@ -161,9 +146,9 @@ CAPTURE_COOLDOWN = 0.5
 # Número mínimo de capturas por carta recomendado
 MIN_CAPTURES_PER_CARD = 4
 
-# ============================================================================
+
 # CONFIGURACIÓN DE LOGGING
-# ============================================================================
+
 
 # Nivel de logging: 'DEBUG', 'INFO', 'WARNING', 'ERROR'
 LOG_LEVEL = 'INFO'
@@ -171,9 +156,9 @@ LOG_LEVEL = 'INFO'
 # Archivo de log
 LOG_FILE = os.path.join(BASE_DIR, 'card_recognition.log')
 
-# ============================================================================
+
 # FUNCIONES AUXILIARES
-# ============================================================================
+
 
 def get_rtsp_url():
     """Retorna la URL RTSP configurada."""
@@ -207,16 +192,22 @@ def is_valid_card_label(label):
 def print_config_summary():
     """Imprime un resumen de la configuración actual."""
     print("=" * 60)
-    print("CONFIGURACIÓN DEL SISTEMA")
+    print("CONFIGURACIÓN DEL SISTEMA - VISIÓN ARTIFICIAL CLÁSICA")
     print("=" * 60)
     print(f"RTSP URL: {RTSP_URL}")
     print(f"Dimensiones carta: {CARD_WIDTH}x{CARD_HEIGHT}")
     print(f"ROI Valor: {ROI_CORNER_VALUE} (x, y, w, h)")  
+    print(f"ROI Palo: {ROI_CORNER_SUIT} (x, y, w, h)")
     print(f"HSV Fondo: {LOWER_COLOR_FONDO} - {UPPER_COLOR_FONDO}")
-    print(f"Clasificador: {CLASSIFIER_TYPE}")
-    print(f"Template Value Size: {TEMPLATE_VALUE_SIZE}") 
-    print(f"Directorio datos: {TRAINING_DATA_DIR}")
-    print(f"Modelo guardado en: {MODEL_PATH}")
+    print(f"\nTÉCNICA DE CLASIFICACIÓN:")
+    print(f"  Método: Template Matching")
+    print(f"  Algoritmo: {TEMPLATE_MATCHING_METHOD}")
+    print(f"  Umbral: {TEMPLATE_MATCH_THRESHOLD}")
+    print(f"  Template Value Size: {TEMPLATE_VALUE_SIZE}") 
+    print(f"  Template Suit Size: {TEMPLATE_SUIT_SIZE}")
+    print(f"\nDIRECTORIOS:")
+    print(f"  Referencias: {REFERENCE_DIR}")
+    print(f"  Templates: {TEMPLATES_DIR}")
     print("=" * 60)
 
 if __name__ == "__main__":

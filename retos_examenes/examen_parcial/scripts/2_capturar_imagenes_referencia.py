@@ -244,7 +244,6 @@ def capturar_imagenes_referencia():
             mostrar_progreso()
         
         elif key == ord('s'):
-            print("\n🔍 DEBUG: Tecla 's' presionada")
             
             # Verificar cooldown
             tiempo_actual = time.time()
@@ -263,7 +262,6 @@ def capturar_imagenes_referencia():
             print("\n" + "-" * 60)
             etiqueta = input("📝 Introduce la etiqueta (ejemplo: AS_PICAS): ").upper().strip()
             
-            print(f"🔍 DEBUG: Etiqueta recibida: '{etiqueta}'")
             
             # Validar etiqueta
             if not validar_etiqueta(etiqueta):
@@ -274,14 +272,12 @@ def capturar_imagenes_referencia():
             
             # Obtener número siguiente
             numero = obtener_siguiente_numero(etiqueta)
-            print(f"🔍 DEBUG: Número asignado: {numero}")
             
             # Guardar imagen
             filename = f"{etiqueta}_{numero}.jpg"
             filepath = os.path.join(IMAGENES_REFERENCIA_DIR, filename)
             
-            print(f"🔍 DEBUG: Intentando guardar en: {filepath}")
-            print(f"🔍 DEBUG: Directorio existe: {os.path.exists(IMAGENES_REFERENCIA_DIR)}")
+
             
             try:
                 resultado = cv2.imwrite(filepath, warped_card)

@@ -201,10 +201,10 @@ class CardRecognitionSystem:
                     # Fondo para el texto
                     (w, h), _ = cv2.getTextSize(texto, cv2.FONT_HERSHEY_SIMPLEX, 1.0, 2)
                     cv2.rectangle(frame, (cx - w//2 - 10, cy - h - 20), 
-                                 (cx + w//2 + 10, cy + 10), (0, 0, 0), -1)
+                                (cx + w//2 + 10, cy + 10), (0, 0, 0), -1)
                     
                     cv2.putText(frame, texto, (cx - w//2, cy),
-                               cv2.FONT_HERSHEY_SIMPLEX, 1.0, COLOR_WHITE, 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 1.0, COLOR_WHITE, 2)
                     
                     # Suavizado temporal (voting)
                     self.classification_history.append(result['carta'])
@@ -239,43 +239,43 @@ class CardRecognitionSystem:
         
         # Título
         cv2.putText(frame, "RECONOCIMIENTO DE CARTAS - VISION ARTIFICIAL CLASICA", 
-                   (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, COLOR_YELLOW, 2)
+                (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, COLOR_YELLOW, 2)
         
         # FPS
         cv2.putText(frame, f"FPS: {self.fps}", (10, 60),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, COLOR_WHITE, 2)
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, COLOR_WHITE, 2)
         
         # Modo
         modo_texto = "MULTIPLES CARTAS" if self.multi_card_mode else "UNA CARTA"
         cv2.putText(frame, f"Modo: {modo_texto}", (150, 60),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, COLOR_WHITE, 2)
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, COLOR_WHITE, 2)
         
         # Debug
         if self.debug_mode:
             cv2.putText(frame, "DEBUG: ON", (400, 60),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
         
         # Pausa
         if self.paused:
             cv2.putText(frame, "PAUSADO", (550, 60),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, COLOR_RED, 2)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, COLOR_RED, 2)
         
         # Estadísticas de sesión
         stats_y = 90
         cv2.putText(frame, f"Cartas unicas: {len(self.session_stats['cartas_detectadas'])}", 
-                   (10, stats_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLOR_WHITE, 1)
+                (10, stats_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLOR_WHITE, 1)
         
         tiempo_sesion = int(time.time() - self.session_stats['tiempo_inicio'])
         mins = tiempo_sesion // 60
         secs = tiempo_sesion % 60
         cv2.putText(frame, f"Tiempo: {mins:02d}:{secs:02d}", 
-                   (250, stats_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLOR_WHITE, 1)
+                (250, stats_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLOR_WHITE, 1)
         
         # Panel inferior: Controles
         controles_y = h - 30
         controles = "q:Salir | m:Modo | d:Debug | p:Pausa | s:Screenshot | r:Reset"
         cv2.putText(frame, controles, (10, controles_y),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLOR_YELLOW, 1)
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLOR_YELLOW, 1)
         
         return frame
     
