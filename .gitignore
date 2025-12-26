@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+
+# Datasets
+EMNIST/
+
+# Modelos entrenados
+*.pth
+
+# Entornos virtuales
+.venv/
+env/
