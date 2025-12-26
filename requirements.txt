@@ -1,0 +1,20 @@
+# Dependencias del Proyecto OCR
+
+# Deep Learning
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Procesamiento de Imágenes
+opencv-python>=4.8.0
+Pillow>=10.0.0
+numpy>=1.24.0
+
+# Visualización
+matplotlib>=3.7.0
+
+# Utilidades
+tqdm>=4.65.0
+
+# Opcional: para exportar a otros formatos
+# pandas>=2.0.0  # Para trabajar con tablas
+# openpyxl>=3.1.0  # Para exportar a Excel
