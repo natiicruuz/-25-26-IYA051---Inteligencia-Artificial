@@ -11,3 +11,6 @@ EMNIST/
 # Entornos virtuales
 .venv/
 env/
+
+data/normalized
+data/raw
