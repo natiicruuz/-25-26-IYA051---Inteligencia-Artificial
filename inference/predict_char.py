@@ -1,15 +1,16 @@
 """
-Script para predecir un solo carácter desde una imagen.
+Script de predicción para caracteres normalizados - VERSIÓN FINAL.
 
-Este script carga un modelo entrenado y predice el carácter contenido
-en una imagen de un solo carácter.
+Compatible con:
+- Dataset normalizado (fondo negro, letra blanca)
+- Modelos entrenados con custom + EMNIST
+- PyTorch 2.6+
 """
 
 import os
 import sys
 import argparse
 
-# Añadir el directorio raíz al path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import torch
@@ -19,13 +20,18 @@ from models.cnn import OCRCNN
 from models.ocr_model import OCRModelWrapper
 
 
-def create_transforms():
-    """Crea las transformaciones para preprocesar imágenes."""
+def create_transforms_for_normalized():
+    """
+    Transformaciones para imágenes YA NORMALIZADAS.
+    
+    CRÍTICO: NO aplicar Normalize() porque las imágenes del dataset
+    normalizado ya tienen fondo negro (0) y letra blanca (255).
+    """
     return transforms.Compose([
         transforms.Grayscale(),
         transforms.Resize((28, 28)),
         transforms.ToTensor(),
-        transforms.Normalize((0.5,), (0.5,))
+        # SIN Normalize((0.5,), (0.5,)) - ya está normalizado
     ])
 
 
@@ -35,21 +41,20 @@ def predict_character(
     show_image: bool = True
 ) -> str:
     """
-    Predice el carácter en una imagen.
+    Predice el carácter en una imagen normalizada.
     
     Args:
-        image_path: Ruta a la imagen del carácter.
-        model_path: Ruta al modelo entrenado (.pth).
-        show_image: Si True, muestra la imagen con la predicción.
+        image_path: Ruta a la imagen del carácter
+        model_path: Ruta al modelo entrenado (.pth)
+        show_image: Si True, muestra la imagen
     
     Returns:
-        Carácter predicho.
+        Carácter predicho
     """
-    print(f"\n{'='*60}")
-    print(f"PREDICCIÓN DE CARÁCTER")
-    print(f"{'='*60}")
+    print(f"\n{'='*70}")
+    print(f" PREDICCIÓN DE CARÁCTER")
+    print(f"{'='*70}")
     
-    # Verificar que existen los archivos
     if not os.path.exists(image_path):
         raise FileNotFoundError(f"No se encontró la imagen: {image_path}")
     
@@ -59,40 +64,57 @@ def predict_character(
     print(f"\nImagen: {image_path}")
     print(f"Modelo: {model_path}")
     
-    # Cargar checkpoint
+    # Cargar modelo
     print("\nCargando modelo...")
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    checkpoint = torch.load(model_path, map_location=device, weights_only=False)
     
-    # Crear configuración y modelo
+    try:
+        checkpoint = torch.load(model_path, map_location=device, weights_only=False)
+    except Exception as e:
+        print(f"❌ Error cargando modelo: {e}")
+        print("Verifica que el archivo .pth sea válido")
+        sys.exit(1)
+    
     config = checkpoint['config']
     model = OCRCNN(config)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
     
-    print(f"Modelo cargado correctamente")
-    print(f"Dispositivo: {device}")
-    print(f"Número de clases: {config.num_classes}")
+    print(f"✓ Modelo cargado correctamente")
+    print(f"  Dispositivo: {device}")
+    print(f"  Clases: {config.num_classes}")
     
-    # Crear wrapper
-    transform = create_transforms()
+    # Crear transformaciones SIN normalización extra
+    transform = create_transforms_for_normalized()
     wrapper = OCRModelWrapper(model, transform, config)
     
     # Predecir
     print("\nRealizando predicción...")
-    predicted_char = wrapper.predict_single_char(image_path, show_image=show_image)
+    try:
+        predicted_char = wrapper.predict_single_char(image_path, show_image=show_image)
+    except Exception as e:
+        print(f"❌ Error en predicción: {e}")
+        sys.exit(1)
     
-    print(f"\n{'='*60}")
-    print(f"RESULTADO: '{predicted_char}'")
-    print(f"{'='*60}\n")
+    print(f"\n{'='*70}")
+    print(f" RESULTADO: '{predicted_char}'")
+    print(f"{'='*70}\n")
     
     return predicted_char
 
 
 def main():
-    """Función principal del script."""
     parser = argparse.ArgumentParser(
-        description='Predecir un carácter desde una imagen'
+        description='Predecir carácter desde imagen normalizada',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Ejemplos:
+  # Predicción básica
+  python inference/predict_char.py --image test.png --model models/weights/final_custom_emnist_*.pth
+  
+  # Sin mostrar imagen
+  python inference/predict_char.py --image test.png --model models/weights/modelo.pth --no-show
+        """
     )
     
     parser.add_argument(
@@ -112,12 +134,11 @@ def main():
     parser.add_argument(
         '--no-show',
         action='store_true',
-        help='No mostrar la imagen (solo imprimir resultado)'
+        help='No mostrar la imagen (solo resultado)'
     )
     
     args = parser.parse_args()
     
-    # Predecir
     predicted = predict_character(
         image_path=args.image,
         model_path=args.model,
