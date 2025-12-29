@@ -1,313 +1,208 @@
-# 📝 Sistema OCR para Caracteres Manuscritos
+# 🔤 Sistema OCR - Reconocimiento de Caracteres Manuscritos
 
-Sistema de Reconocimiento Óptico de Caracteres (OCR) implementado desde cero usando PyTorch para detectar y transcribir texto manuscrito en español (incluyendo Ñ/ñ).
+**Trabajo Final de la asignatura - Inteligencia Artificial curso 2024-2025**
 
-## 🎯 Características
-
-### Funcionalidades Principales
-- ✅ **Reconocimiento de texto manuscrito** (letras mayúsculas, minúsculas y números)
-- ✅ **Soporte para español** (incluye Ñ y ñ)
-- ✅ **Segmentación automática** de palabras y letras
-- ✅ **Pipeline completo** de entrenamiento e inferencia
-
-### Funcionalidades Extras
-- 📊 **Detección de tablas** con exportación a Markdown
-- 🖼️ **Extracción de figuras/imágenes** del documento
-- 📈 **Visualización** de métricas de entrenamiento
-- 💾 **Guardado de predicciones** en formato texto
-
-## 📁 Estructura del Proyecto
-
-```
-ocr_proyecto/
-├── data/                          # Datos del proyecto
-│   ├── raw/                       # Datos sin procesar
-│   ├── processed/                 # Datos procesados
-│   └── labels/                    # Etiquetas
-│
-├── models/                        # Arquitectura del modelo
-│   ├── config.py                  # Configuración y mapeos
-│   ├── cnn.py                     # Red neuronal convolucional
-│   ├── ocr_model.py              # Wrapper del modelo
-│   └── weights/                   # Modelos entrenados
-│
-├── datasets/                      # Carga de datasets
-│   ├── handwritten_dataset.py    # Dataset manuscrito custom
-│   └── combined_dataset.py       # Combinación custom + EMNIST
-│
-├── segmentation/                  # Segmentación de imágenes
-│   ├── word_segmentation.py      # Detección de palabras
-│   └── letter_segmentation.py    # Extracción de letras
-│
-├── training/                      # Scripts de entrenamiento
-│   ├── train_handwritten.py      # Entrenar con dataset custom
-│   └── train_combined.py         # Entrenar con custom + EMNIST
-│
-├── inference/                     # Scripts de predicción
-│   ├── predict_char.py           # Predecir un carácter
-│   ├── predict_word.py           # Predecir una palabra
-│   └── predict_document.py       # Predecir documento completo
-│
-├── extras/                        # Funcionalidades adicionales
-│   ├── detect_tables.py          # Detección de tablas
-│   └── detect_figures.py         # Detección de figuras
-│
-├── utils/                         # Utilidades
-│   ├── image_utils.py            # Procesamiento de imágenes
-│   └── viz.py                    # Visualización
-│
-├── main.py                        # Script principal
-└── requirements.txt               # Dependencias
-```
-
-## 🚀 Instalación
-
-### 1. Clonar/descargar el proyecto
-
-```bash
-cd ocr_proyecto
-```
-
-### 2. Crear entorno virtual (recomendado)
-
-```bash
-python -m venv venv
-
-# Activar en Windows
-venv\Scripts\activate
-
-# Activar en Linux/Mac
-source venv/bin/activate
-```
-
-### 3. Instalar dependencias
-
-```bash
-pip install -r requirements.txt
-```
-
-## 📚 Uso
-
-### Entrenamiento
-
-#### Opción 1: Solo dataset manuscrito custom (90 épocas)
-
-```bash
-python training/train_handwritten.py \
-    --dataset /ruta/al/dataset \
-    --epochs 90 \
-    --batch-size 128 \
-    --save-dir ./models/weights
-```
-
-**Estructura esperada del dataset:**
-```
-dataset/
-├── mayúsculas/
-│   ├── A/
-│   │   ├── A_Nombre_Apellido.png
-│   └── ...
-├── minúsculas/
-│   ├── a/
-│   │   ├── a_Nombre_Apellido.png
-│   └── ...
-└── números/
-    ├── 0/
-    │   ├── 0_Nombre_Apellido.png
-    └── ...
-```
-
-#### Opción 2: Dataset combinado (custom + EMNIST, 8 épocas)
-
-```bash
-python training/train_combined.py \
-    --custom-dataset /ruta/al/dataset \
-    --emnist-root ./data \
-    --epochs 8 \
-    --batch-size 128
-```
-
-### Inferencia
-
-#### 1. Predecir un carácter individual
-
-```bash
-python inference/predict_char.py \
-    --image imagen_caracter.png \
-    --model models/weights/modelo.pth
-```
-
-#### 2. Predecir una palabra
-
-```bash
-python inference/predict_word.py \
-    --image imagen_palabra.png \
-    --model models/weights/modelo.pth
-```
-
-#### 3. Predecir documento completo
-
-```bash
-python inference/predict_document.py \
-    --image documento.png \
-    --model models/weights/modelo.pth \
-    --output documento_texto.txt
-```
-
-### Pipeline Completo (main.py)
-
-#### OCR básico (solo texto)
-
-```bash
-python main.py \
-    --image documento.png \
-    --model models/weights/modelo.pth
-```
-
-#### OCR completo (texto + tablas + figuras)
-
-```bash
-python main.py \
-    --image documento.png \
-    --model models/weights/modelo.pth \
-    --extract-tables \
-    --extract-figures \
-    --output ./resultados
-```
-
-### Funcionalidades Extras
-
-#### Detectar tablas
-
-```bash
-python extras/detect_tables.py \
-    --image documento.png \
-    --output-dir ./tablas_extraidas \
-    --visualize
-```
-
-#### Detectar figuras
-
-```bash
-python extras/detect_figures.py \
-    --image documento.png \
-    --output-dir ./figuras_extraidas \
-    --visualize
-```
-
-## 🏗️ Arquitectura del Modelo
-
-### Red Neuronal Convolucional (OCRCNN)
-
-```
-Input: (1, 28, 28)
-    ↓
-[Bloque Conv 1] → 32 filtros → ReLU → BatchNorm → MaxPool → Dropout(0.3)
-    ↓
-[Bloque Conv 2] → 64 filtros → ReLU → BatchNorm → MaxPool → Dropout(0.3)
-    ↓
-[Bloque Conv 3] → 96 filtros → ReLU → BatchNorm → MaxPool → Dropout(0.3)
-    ↓
-Flatten → (864,)
-    ↓
-[FC 1] → 320 → ReLU → Dropout(0.5)
-    ↓
-[FC 2] → 160 → ReLU → Dropout(0.5)
-    ↓
-[Output] → num_classes (62 o 64)
-```
-
-**Parámetros:**
-- Total de parámetros: ~350,000
-- Optimizador: Adam (lr=0.001)
-- Función de pérdida: CrossEntropyLoss
-
-## 📊 Datasets
-
-### Dataset Custom
-- **Clases**: 64 (0-9, A-Z, Ñ, a-z, ñ)
-- **Formato**: Imágenes PNG organizadas por carpetas
-- **Preprocesamiento**: Grayscale, Resize(28x28), Normalización
-
-### EMNIST (Extended MNIST)
-- **Clases**: 62 (0-9, A-Z, a-z, sin Ñ/ñ)
-- **Fuente**: Torchvision datasets
-- **Preprocesamiento**: Rotación, flip, inversión de colores
-
-## 🎯 Resultados Esperados
-
-Con un entrenamiento adecuado, el modelo debería alcanzar:
-- **Precisión en custom dataset**: ~85-95%
-- **Precisión en EMNIST**: ~90-95%
-- **Precisión en dataset combinado**: ~88-93%
-
-## 🔧 Personalización
-
-### Modificar arquitectura del modelo
-
-Edita `models/cnn.py`:
-
-```python
-# Ejemplo: Añadir más filtros
-nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
-```
-
-### Cambiar transformaciones
-
-Edita las transformaciones en los scripts de entrenamiento o en `utils/image_utils.py`.
-
-### Añadir nuevas clases
-
-Modifica los mapeos en `models/config.py`:
-
-```python
-self._custom_mapping = [
-    '0', '1', ..., 'z', '!', '?'  # Añadir símbolos
-]
-```
-
-## 📝 Notas Importantes
-
-1. **Restricción del proyecto**: No se usan librerías de OCR de alto nivel (Tesseract, EasyOCR, etc.)
-2. **Solo manuscrito**: El proyecto se centra en texto manuscrito (no texto impreso)
-3. **Español**: Soporte completo para caracteres españoles (Ñ, ñ)
-4. **GPU**: El entrenamiento es más rápido con GPU (CUDA)
-
-## 🐛 Solución de Problemas
-
-### Error: "No module named 'torch'"
-```bash
-pip install torch torchvision
-```
-
-### Error: "CUDA out of memory"
-Reduce el `batch_size`:
-```bash
-python training/train_handwritten.py --batch-size 64
-```
-
-### Baja precisión en predicciones
-- Verifica que las imágenes tengan buena calidad
-- Asegúrate de que el modelo esté bien entrenado (>80 épocas)
-- Prueba con el dataset combinado (custom + EMNIST)
-
-## 📄 Licencia
-
-Este proyecto es un trabajo académico para la asignatura de Inteligencia Artificial.
-
-## 👥 Autor
-
-Desarrollado como proyecto final de IA - 2025
+Sistema de OCR implementado desde cero para reconocer texto manuscrito.
 
 ---
 
-## 🎓 Trabajo Académico
+## 📋 Resumen del Proyecto
 
-**Asignatura**: Inteligencia Artificial  
-**Año**: 2025  
-**Requisitos cumplidos**:
-- ✅ Reconocimiento de texto manuscrito
-- ✅ Segmentación de palabras y letras
-- ✅ Detección de tablas (extra)
-- ✅ Detección de figuras (extra)
-- ✅ Sin uso de librerías OCR de alto nivel
+### Objetivo
+Desarrollar un sistema OCR capaz de reconocer caracteres manuscritos individuales y palabras completas sin usar bibliotecas especializadas de OCR (como Tesseract).
+
+### Funcionalidades Implementadas
+
+#### ✅ Obligatorias
+- **Reconocimiento de caracteres manuscritos**: Letras (A-Z, a-z), números (0-9) y caracteres españoles (Ñ, ñ)
+- **Reconocimiento de palabras**: Segmentación automática y predicción letra por letra
+- **Arquitectura CNN propia**: Red neuronal convolucional entrenada desde cero
+---
+
+## 🏗️ Arquitectura
+
+### Modelo CNN
+
+```
+Input (1, 28, 28)
+     ↓
+Conv2d(1→32) + ReLU + BatchNorm + MaxPool + Dropout(0.3)
+     ↓
+Conv2d(32→64) + ReLU + BatchNorm + MaxPool + Dropout(0.3)
+     ↓
+Conv2d(64→96) + ReLU + BatchNorm + MaxPool + Dropout(0.3)
+     ↓
+Flatten → 864
+     ↓
+Linear(864→320) + ReLU + Dropout(0.5)
+     ↓
+Linear(320→160) + ReLU + Dropout(0.5)
+     ↓
+Output: 62 clases (0-9, A-Z, a-z)
+```
+
+**Hiperparámetros:**
+- Optimizador: Adam (lr=0.001)
+- Función de pérdida: CrossEntropyLoss
+- Batch size: 128
+- Épocas: 15
+
+---
+
+## 📊 Datasets Utilizados
+
+### 1. Dataset Custom (Manuscrito)
+- **Fuente**: Caracteres manuscritos de compañeros de clase
+- **Clases**: 64 (incluye Ñ y ñ)
+- **Total**: ~4,500 imágenes
+- **División**: 80% entrenamiento, 20% validación
+
+### 2. EMNIST (Extended MNIST)
+- **Fuente**: Dataset público de caracteres manuscritos
+- **Clases**: 62 (sin Ñ ni ñ)
+- **Total**: ~700,000 imágenes
+- **Uso**: Entrenamiento combinado para mejorar generalización
+
+### Preprocesamiento
+- Conversión a escala de grises
+- Redimensionamiento a 28×28 píxeles
+- Normalización (media=0.5, desv=0.5)
+- Binarización (fondo negro, letra blanca)
+
+---
+
+## 📈 Resultados
+
+### Precisión Alcanzada
+- **Caracteres individuales**: 60-70%
+- **Palabras simples**: Funcional (ejemplo: "sock" reconocido correctamente)
+
+### Análisis del Entrenamiento
+
+|  Gráficas | Imagen |
+|------|------|
+| Gráfica de entrenamiento| ![](models/weights/training_final_20251229_011645.png)|
+| Predicciones| ![](models/weights/predictions_final_20251229_011645.png)|
+
+**Observaciones:**
+- Aprendizaje efectivo hasta época 8
+- Overfitting leve detectado después de época 8
+- Val loss mínimo: 0.35 (época 8)
+
+---
+
+## 🚀 Uso del Sistema
+
+### Instalación
+
+```bash
+# 1. Crear entorno virtual
+python -m venv venv
+venv\Scripts\activate  # Windows
+
+# 2. Instalar dependencias
+pip install -r requirements.txt
+```
+
+### Predicción de Caracteres
+
+```bash
+python inference/predict_char.py \
+    --image test_char.png \
+    --model models/weights/modelo_final.pth
+```
+
+### Predicción de Palabras
+
+```bash
+python inference/predict_word.py \
+    --image test_word.png \
+    --model models/weights/modelo_final.pth
+```
+
+---
+
+## 📁 Estructura del Código
+
+```
+ocr_proyecto/
+├── models/             # Arquitectura del modelo
+│   ├── config.py       # Configuración y mapeos
+│   ├── cnn.py          # Red CNN
+│   └── ocr_model.py    # Wrapper para inferencia
+│
+├── datasets/            # Carga de datos
+│   ├── normalized_dataset.py
+│   └── combined_dataset.py
+│
+├── training/            # Scripts de entrenamiento
+│   └── train_custom_emnist.py
+│
+├── inference/           # Scripts de predicción
+│   ├── predict_char.py
+│   └── predict_word.py
+│
+├── segmentation/        # Segmentación
+│   ├── word_segmentation.py
+│   └── letter_segmentation.py
+│
+├── extras/              # Funcionalidades opcionales
+│   ├── detect_tables.py
+│   └── detect_figures.py
+│
+└── utils/               # Utilidades
+    ├── image_utils.py
+    └── viz.py
+```
+
+---
+
+## 🔧 Tecnologías Utilizadas
+
+### Bibliotecas Principales
+- **PyTorch 2.6.0**: Framework de deep learning
+- **OpenCV 4.8.0**: Procesamiento de imágenes
+- **NumPy 2.1.0**: Computación científica
+- **Matplotlib 3.7.0**: Visualización
+
+### ⚠️ Restricciones Cumplidas
+- **NO se usó**: Tesseract, EasyOCR, Google Vision API, o similares
+- ✅ **Solo se usó**: PyTorch (framework general), OpenCV (procesamiento básico)
+- ✅ **Implementación propia**: Toda la lógica de OCR, segmentación y reconocimiento
+
+---
+
+##  Conclusiones
+
+### Logros
+1. Sistema funcional de OCR manuscrito con ~60-70% de precisión
+2. Arquitectura CNN implementada y entrenada desde cero
+3. Segmentación automática de palabras y letras
+4. Soporte para caracteres españoles (Ñ, ñ)
+
+### Limitaciones Actuales
+1. Overfitting detectado después de época 8
+2. Documentos completos requieren optimización adicional
+3. Precisión limitada con datasets pequeños
+
+### Mejoras Futuras
+1. **Early stopping**: Implementar parada automática en época 8-10
+2. **Data augmentation**: Aumentar variabilidad del dataset
+3. **Post-procesamiento**: Corrección ortográfica y diccionarios
+4. **Modelos transformer**: Explorar arquitecturas más avanzadas
+
+---
+
+## 📚 Referencias
+
+1. **EMNIST**: Cohen, G., et al. (2017). "EMNIST: Extending MNIST to handwritten letters"
+2. **PyTorch**: Framework de deep learning - https://pytorch.org
+3. **OpenCV**: Biblioteca de visión por computadora - https://opencv.org
+
+---
+
+<div align="center"> <p style="font-size: 0.9em; color: #666;"> 2025 Sistema OCR - Reconocimiento de Caracteres Manuscritos. Creado por Natalia Cruz.
+
+Trabajo Final de la asignatura - IA 2025/2026.
+</p>
+</div>
