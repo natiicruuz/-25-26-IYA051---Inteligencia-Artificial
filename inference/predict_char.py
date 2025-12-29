@@ -1,5 +1,5 @@
 """
-Script de predicción para caracteres normalizados - VERSIÓN FINAL.
+Script de predicción para caracteres normalizados
 
 Compatible con:
 - Dataset normalizado (fondo negro, letra blanca)
@@ -24,14 +24,11 @@ def create_transforms_for_normalized():
     """
     Transformaciones para imágenes YA NORMALIZADAS.
     
-    CRÍTICO: NO aplicar Normalize() porque las imágenes del dataset
-    normalizado ya tienen fondo negro (0) y letra blanca (255).
     """
     return transforms.Compose([
         transforms.Grayscale(),
         transforms.Resize((28, 28)),
         transforms.ToTensor(),
-        # SIN Normalize((0.5,), (0.5,)) - ya está normalizado
     ])
 
 
@@ -108,12 +105,12 @@ def main():
         description='Predecir carácter desde imagen normalizada',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Ejemplos:
-  # Predicción básica
-  python inference/predict_char.py --image test.png --model models/weights/final_custom_emnist_*.pth
-  
-  # Sin mostrar imagen
-  python inference/predict_char.py --image test.png --model models/weights/modelo.pth --no-show
+        Ejemplos:
+        # Predicción básica
+        python inference/predict_char.py --image test.png --model models/weights/final_custom_emnist_*.pth
+        
+        # Sin mostrar imagen
+        python inference/predict_char.py --image test.png --model models/weights/modelo.pth --no-show
         """
     )
     

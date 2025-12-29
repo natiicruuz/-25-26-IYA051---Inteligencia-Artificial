@@ -2,10 +2,9 @@
 Script de entrenamiento: Custom normalizado + EMNIST.
 
 Este script combina tu dataset normalizado con EMNIST para obtener:
-- Tu dataset: datos reales manuscritos
+- dataset propio: datos reales manuscritos
 - EMNIST: volumen de datos para generalización
 
-Precisión esperada: 85-92%
 """
 
 import os
