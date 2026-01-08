@@ -191,7 +191,7 @@ class OCRModelWrapper:
         word_index: int = 0
     ) -> List[str]:
         """
-        Predice una secuencia de letras a partir de imágenes individuales.
+        Predice una secuencia de letras con preprocesamiento mejorado.
         
         Args:
             letter_images: Lista de imágenes de letras (numpy arrays).
@@ -202,50 +202,117 @@ class OCRModelWrapper:
             Lista de caracteres predichos.
         """
         predictions = []
+        processed_images = []
+        skipped_indices = []
         
         if show_visualization:
             n = len(letter_images)
-            fig, axes = plt.subplots(1, n, figsize=(2*n, 3))
+            fig, axes = plt.subplots(2, n, figsize=(2*n, 6))
             if n == 1:
-                axes = [axes]
+                axes = [[axes[0]], [axes[1]]]
+            axes = np.array(axes).reshape(2, -1)
         
         for idx, letter_img in enumerate(letter_images):
-            # Preprocesar letra
-            if isinstance(letter_img, np.ndarray) and len(letter_img.shape) > 0:
-                # Redimensionar y convertir
-                letter_img = resize_with_padding(letter_img, (28, 28))
-                
+            # ============== VALIDACIÓN BÁSICA ==============
+            
+            if not isinstance(letter_img, np.ndarray) or len(letter_img.shape) == 0:
+                print(f"  ⚠️  Letra {idx+1}: Formato inválido, saltando...")
+                skipped_indices.append(idx)
+                continue
+            
+            h, w = letter_img.shape[:2]
+            
+            # SOLO filtrar ruido MUY obvio (punto pequeño < 10x10)
+            if h < 10 and w < 10:
+                print(f"  ⚠️  Letra {idx+1}: Muy pequeña ({w}x{h}), probablemente un punto. Saltando...")
+                skipped_indices.append(idx)
+                continue
+            
+            # Advertencia pero CONTINUAR procesando
+            if h < 20 or w < 15:
+                print(f"  ⚠️  Letra {idx+1}: Pequeña ({w}x{h}), puede ser 'i', 'l', '1' o ruido. Procesando de todos modos...")
+            
+            # ============== PREPROCESAMIENTO ==============
+            
+            # 1. Convertir a escala de grises
+            if len(letter_img.shape) == 3:
+                gray = cv2.cvtColor(letter_img, cv2.COLOR_BGR2GRAY)
+            else:
+                gray = letter_img.copy()
+            
+            # 2. Binarizar con Otsu
+            _, binary = cv2.threshold(
+                gray, 0, 255, 
+                cv2.THRESH_BINARY + cv2.THRESH_OTSU
+            )
+            
+            # 3. Invertir si necesario (modelo espera fondo blanco, letra negra)
+            mean_val = np.mean(binary)
+            if mean_val < 127:
+                binary = cv2.bitwise_not(binary)
+            
+            # 4. Redimensionar con padding (mantiene aspect ratio)
+            from utils.image_utils import resize_with_padding
+            resized = resize_with_padding(binary, (28, 28), pad_color=255)
+            
+            # 5. Suavizado ligero para reducir pixelación
+            resized = cv2.GaussianBlur(resized, (3, 3), 0)
+            
+            # 6. Convertir a PIL y aplicar transforms
+            from PIL import Image
+            pil_img = Image.fromarray(resized)
+            transformed_tensor = self.transform(pil_img)
+            
+            # ============== PREDICCIÓN ==============
+            
+            with torch.no_grad():
+                output = self.model(transformed_tensor.unsqueeze(0).to(self.device))
+                probabilities = torch.nn.functional.softmax(output, dim=1)
+                confidence, predicted = torch.max(probabilities, 1)
+            
+            pred_char = self.mapping[predicted.item()]
+            conf_value = confidence.item()
+            
+            # Mostrar confianza
+            if conf_value < 0.5:
+                print(f"  ⚠️  Letra {idx+1}: Predicción '{pred_char}' con baja confianza ({conf_value:.2%})")
+            
+            predictions.append(pred_char)
+            processed_images.append(resized)
+            
+            # ============== VISUALIZACIÓN ==============
+            
+            if show_visualization:
+                # Fila 1: Imagen ORIGINAL
                 if len(letter_img.shape) == 3:
-                    letter_img = convert_to_grayscale(letter_img)
+                    axes[0, idx].imshow(cv2.cvtColor(letter_img, cv2.COLOR_BGR2RGB))
+                else:
+                    axes[0, idx].imshow(letter_img, cmap='gray')
+                axes[0, idx].set_title(f"Original {idx+1}\n({w}x{h}px)", fontsize=8)
+                axes[0, idx].axis('off')
                 
-                # Convertir a PIL y aplicar transformaciones
-                pil_img = Image.fromarray(letter_img)
-                transformed_tensor = self.transform(pil_img)
+                # Fila 2: Imagen PROCESADA + predicción
+                axes[1, idx].imshow(resized, cmap='gray')
                 
-                # Predecir
-                with torch.no_grad():
-                    output = self.model(transformed_tensor.unsqueeze(0).to(self.device))
-                    _, predicted = torch.max(output, 1)
-                
-                pred_char = self.mapping[predicted.item()]
-                predictions.append(pred_char)
-                
-                # Visualizar si se solicita
-                if show_visualization:
-                    if len(letter_img.shape) == 3:
-                        axes[idx].imshow(cv2.cvtColor(letter_img, cv2.COLOR_BGR2RGB))
-                    else:
-                        axes[idx].imshow(letter_img, cmap='gray')
-                    axes[idx].set_title(f"L{idx+1}: {pred_char}", fontsize=10)
-                    axes[idx].axis('off')
+                # Color según confianza
+                color = 'green' if conf_value > 0.7 else 'orange' if conf_value > 0.5 else 'red'
+                axes[1, idx].set_title(
+                    f"→ '{pred_char}'\n{conf_value:.0%}", 
+                    fontsize=11, fontweight='bold', color=color
+                )
+                axes[1, idx].axis('off')
         
         if show_visualization:
-            plt.suptitle(f"Palabra {word_index + 1}: {''.join(predictions)}", 
-                        fontsize=12, fontweight='bold')
+            plt.suptitle(
+                f"Palabra {word_index + 1}: {''.join(predictions)}\n"
+                f"(Arriba: Original | Abajo: Procesada + Predicción)", 
+                fontsize=14, fontweight='bold'
+            )
             plt.tight_layout()
             plt.show()
         
         return predictions
+    
     
     def save_model(self, path: str):
         """
