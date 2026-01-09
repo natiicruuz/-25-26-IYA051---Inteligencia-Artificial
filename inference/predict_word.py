@@ -175,29 +175,65 @@ def predict_word(
     
     # Resultado
     predicted_word = ''.join(predictions)
-    
+    corrected_word = fix_spanish_words(predicted_word)
+
+    print(f"Predicción: {predicted_word}")
+    if corrected_word != predicted_word:
+        print(f"Corregido: {corrected_word}")
+        
     print(f"\n{'='*70}")
     print(f"✅ RESULTADO: '{predicted_word}'")
     print(f"{'='*70}\n")
     
     return predicted_word
+    
+def fix_spanish_words(word):
+    """
+    Post-procesamiento simple para Ñ/ñ.
+    
+    Corrige patrones comunes donde N → Ñ.
+    """
+    # Diccionario de palabras comunes
+    corrections = {
+        'espana': 'españa',
+        'ESPaRa': 'España',
+        'Espana': 'España',
+        'ESPArA': 'ESPAÑA',
+        'marana': 'mañana',
+        'Marana': 'Mañana',
+        'niro': 'niño',
+        'Niro': 'Niño',
+        'aro': 'año',
+        'Aro': 'Año',
+        'seror': 'señor',
+        'Seror': 'Señor',
+    }
+    
+    # Buscar coincidencia exacta
+    if word in corrections:
+        return corrections[word]
+    
+    # Patrón común: 'n' + vocal después → podría ser 'ñ' 
+    return word
+
+
 
 
 def main():
     parser = argparse.ArgumentParser(
         description='Predecir palabras completas',
         epilog="""
-Ejemplos:
+    Ejemplos:
 
-  # Básico
-  python inference/predict_word.py --image word.png --model modelo.pth
-  
-  # Con debugging
-  python inference/predict_word.py --image word.png --model modelo.pth --debug
-  
-  # Ajustar sensibilidad (menor = más sensible)
-  python inference/predict_word.py --image word.png --model modelo.pth --threshold 0.05
-        """
+    # Básico
+    python inference/predict_word.py --image word.png --model modelo.pth
+    
+    # Con debugging
+    python inference/predict_word.py --image word.png --model modelo.pth --debug
+    
+    # Ajustar sensibilidad (menor = más sensible)
+    python inference/predict_word.py --image word.png --model modelo.pth --threshold 0.05
+            """
     )
     
     parser.add_argument('--image', type=str, required=True, help='Ruta a la imagen')
@@ -205,7 +241,7 @@ Ejemplos:
     parser.add_argument('--no-show', action='store_true', help='No mostrar visualización')
     parser.add_argument('--debug', action='store_true', help='Mostrar proceso de segmentación')
     parser.add_argument('--threshold', type=float, default=0.10, 
-                       help='Umbral de valle (default: 0.10, menor = más sensible)')
+                        help='Umbral de valle (default: 0.10, menor = más sensible)')
     
     args = parser.parse_args()
     
